@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  email      String       @unique
+  password   String
+  name       String       @unique
+  avatarPath String       @default("/uploads/default-avatar.png") @map("avatar_path")
+  role       EnumUserRole @default(ADMIN)
+  materials  Material[]
+  rating     Rating[]
+  favorites  Favorites[]
+}
+
+enum EnumUserRole {
+  USER
+  ADMIN
+}
+
+model Material {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  title           String   @unique
+  slug            String   @unique
+  description     String
+  file            String
+  datePublication DateTime @default(now()) @map("date_publication")
+
+  user      User        @relation(fields: [userId], references: [id])
+  category  Category    @relation(fields: [categoryId], references: [id])
+  group     Group       @relation(fields: [groupId], references: [id])
+  subject   Subject     @relation(fields: [subjectId], references: [id])
+  level     Level       @relation(fields: [levelId], references: [id])
+  tag        Tag       @relation(fields: [tagId], references: [id])
+  rating    Rating[]
+  favorites Favorites[]
+
+  userId     Int  @map("user_id")
+  categoryId Int  @map("category_id")
+  groupId    Int  @map("group_id")
+  subjectId  Int  @map("subject_id")
+  levelId    Int  @map("level_id")
+  tagId      Int @map("tag_id")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  title    String     @unique
+  material Material[]
+}
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  title    String     @unique
+  material Material[]
+}
+
+model Subject {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  title    String     @unique
+  material Material[]
+}
+
+model Level {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  title    String     @unique
+  material Material[]
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  title    String     @unique
+  material Material[]
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  rate     Int
+  user     User     @relation(fields: [userId], references: [id])
+  material Material @relation(fields: [materialId], references: [id])
+
+  userId     Int @map("user_id")
+  materialId Int @map("material_id")
+}
+
+model Favorites {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
+  user       User     @relation(fields: [userId], references: [id])
+  material   Material @relation(fields: [materialId], references: [id])
+  userId     Int      @map("user_id")
+  materialId Int      @map("material_id")
+}
